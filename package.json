@@ -130,5 +130,11 @@
     "@capacitor/cli": "^7.0.0"
   },
   "description": "Assistente Jurídico — rodando no seu PC, sem Replit, sem Neon.",
-  "author": "Maikon"
+  "author": "Maikon",
+  "build": {
+    "productName": "assistente-juridico (teste 10292328)",
+    "appId": "com.maikon.app.nteste10292328",
+    "executableName": "assistente-juridico-nteste10292328"
+  },
+  "portaDoPrograma": 8136
 }

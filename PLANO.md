@@ -1,19 +1,19 @@
 # 📋 Plano do projeto: Juridico-MiniSK-29-10-Ollama 29-10-2026, 20-25-59
 
-_Gerado em 29/10/2026, 20:27:06 — sem IA, lendo os arquivos._
+_Gerado em 29/10/2026, 20:28:10 — sem IA, lendo os arquivos._
 
 ## 📊 Visão geral
 | Item | Valor |
 |---|---|
-| Arquivos | 162 |
-| Linhas | 47.440 |
+| Arquivos | 165 |
+| Linhas | 48.722 |
 | Telas/páginas | 39 |
 | Rotas do backend | 106 |
 | Chamadas do app | 92 |
 | Tabelas do banco | 16 |
 | Variáveis de ambiente | 24 |
 
-**Linguagens:** TypeScript (React) (71), Imagem (33), TypeScript (19), JSON (9), HTML (7), JavaScript (7), Outros (4), Imagem SVG (4), Markdown (3), Ícone (2), YAML (1), CSS (1), SQL (1)
+**Linguagens:** TypeScript (React) (71), Imagem (33), TypeScript (19), JSON (10), HTML (7), JavaScript (7), Outros (4), Imagem SVG (4), Markdown (4), YAML (2), Ícone (2), CSS (1), SQL (1)
 
 ## 💡 O que fazer (em ordem)
 1. 🧹 Tirar a Replit de 6 arquivo(s) (🏗️ Preparar → Fazer tudo)
@@ -424,7 +424,8 @@ _Só os nomes. Os valores (chaves, senhas) nunca vão no código nem no GitHub._
 ```
 ├─ 📁 .github/
 │  └─ 📁 workflows/
-│     └─ apk-capacitor.yml
+│     ├─ apk-capacitor.yml
+│     └─ apk.yml
 ├─ 📁 client/
 │  ├─ 📁 icons/
 │  │  ├─ apple-touch-icon.png
@@ -589,6 +590,7 @@ _Só os nomes. Os valores (chaves, senhas) nunca vão no código nem no GitHub._
 ├─ .env.exemplo
 ├─ .gitignore
 ├─ .npmrc
+├─ apk.config.json
 ├─ capacitor.config.json
 ├─ components.json
 ├─ favicon.ico
@@ -599,6 +601,7 @@ _Só os nomes. Os valores (chaves, senhas) nunca vão no código nem no GitHub._
 ├─ package.json
 ├─ PLANO.md
 ├─ postcss.config.js
+├─ RECEITA.md
 ├─ service-worker.js
 ├─ tailwind.config.ts
 ├─ tsconfig.json
