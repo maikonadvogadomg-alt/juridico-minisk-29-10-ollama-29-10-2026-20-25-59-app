@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🦙 Ollama — SK Jurídico</title>
+<style>
+  :root { --fundo:#f6f4ec; --cartao:#fff; --texto:#1f2230; --mudo:#5f6372; --linha:#ddd8c4; --verde:#2f7a55; --vermelho:#b42318; }
+  @media (prefers-color-scheme: dark) { :root { --fundo:#11151f; --cartao:#1a2030; --texto:#e8eaf0; --mudo:#9aa3b5; --linha:#2c3448; --verde:#3f9c6e; --vermelho:#f0705f; } }
+  body { margin:0; background:var(--fundo); color:var(--texto); font:17px/1.5 system-ui,Segoe UI,Roboto,sans-serif; padding:16px; }
+  main { max-width:640px; margin:0 auto; }
+  h1 { font-size:24px; margin:4px 0 2px; }
+  .mudo { color:var(--mudo); font-size:15px; }
+  .cartao { background:var(--cartao); border:1px solid var(--linha); border-radius:12px; padding:14px; margin:14px 0; }
+  button, select { font:inherit; border-radius:10px; padding:10px 14px; border:1px solid var(--linha); background:var(--cartao); color:var(--texto); }
+  button.prim { background:var(--verde); color:#fff; border-color:var(--verde); font-weight:700; }
+  button:disabled { opacity:.5; }
+  .linha { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:8px 0; }
+  select { width:100%; }
+  #st { font-weight:700; }
+  .ok { color:var(--verde); } .erro { color:var(--vermelho); }
+  .sug { display:flex; justify-content:space-between; gap:8px; align-items:center; border:1px solid var(--linha); border-radius:10px; padding:8px 10px; margin:6px 0; font-size:15px; }
+  a { color:inherit; }
+</style>
+</head>
+<body>
+<main>
+  <div class="linha"><a href="/">← Voltar ao jurídico</a></div>
+  <h1>🦙 Ollama — IA grátis no seu aparelho</h1>
+  <p class="mudo">Roda no próprio computador (ou no Termux do celular): sem chave, sem limite, sem internet. Bom para limpar, resumir e revisar processo. Petição longa sai melhor no Gemini.</p>
+
+  <div class="cartao">
+    <div id="st">Verificando…</div>
+    <div id="msg" class="mudo"></div>
+    <div class="linha">
+      <button id="ver">🔄 Verificar</button>
+      <button id="ligar" class="prim" hidden>🦙 Ligar o Ollama</button>
+    </div>
+  </div>
+
+  <div class="cartao" id="usar-box" hidden>
+    <b>Modelo</b>
+    <div class="linha"><select id="modelo"></select></div>
+    <div class="linha">
+      <button id="usar" class="prim">✅ Usar o Ollama no jurídico</button>
+      <button id="voltar">↩ Voltar para o Gemini</button>
+    </div>
+    <p class="mudo" id="usando"></p>
+  </div>
+
+  <div class="cartao" id="baixar-box" hidden>
+    <b>⬇ Baixar um modelo</b> <span class="mudo">(demora alguns minutos; não feche esta página)</span>
+    <div id="sugs"></div>
+  </div>
+
+  <div class="cartao mudo" id="ajuda" hidden>
+    Não tem o Ollama? <b>No computador:</b> instale em <a href="https://ollama.com/download" target="_blank" rel="noopener">ollama.com/download</a> e toque em 🦙 Ligar.
+    <b>No celular:</b> Mini SK → 📱 Termux → 🦙 Ligar o Ollama, depois 🔄 Verificar aqui. No celular use só modelo leve (llama3.2:1b ou qwen2.5:1.5b): modelo grande faz o Android fechar o Termux.
+  </div>
+</main>
+<script>
+(function () {
+  var SUG = [
+    ['llama3.2:3b', 'computador — bom em português, rápido (2 GB)'],
+    ['qwen2.5:7b', 'computador bom — melhor texto jurídico, precisa de 8 GB de memória (4,7 GB)'],
+    ['llama3.2:1b', 'celular — bem leve (1,3 GB)'],
+    ['qwen2.5:1.5b', 'celular — leve, bom em português (1 GB)']
+  ];
+  var $ = function (id) { return document.getElementById(id); };
+  var st = null;
+  function chamar(caminho, metodo, corpo) {
+    return fetch(caminho, { method: metodo || 'GET', headers: corpo ? { 'Content-Type': 'application/json' } : {}, body: corpo ? JSON.stringify(corpo) : undefined })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok && !('ligado' in j)) throw new Error(j.erro || j.message || ('HTTP ' + r.status)); return j; }); });
+  }
+  function emUso() { return localStorage.getItem('custom_api_key') === 'ollama' && localStorage.getItem('legal_model_choice') === 'custom'; }
+  function pintar() {
+    var s = st || { ligado: false, modelos: [] };
+    $('st').textContent = s.ligado ? '✅ Ligado' + (s.modelos.length ? ' · ' + s.modelos.length + ' modelo(s)' : ' · nenhum modelo baixado ainda') : '⭕ Desligado';
+    $('st').className = s.ligado ? 'ok' : 'erro';
+    $('msg').textContent = s.msg || '';
+    $('ligar').hidden = !!s.ligado;
+    $('ajuda').hidden = !!s.ligado;
+    $('usar-box').hidden = !(s.ligado && s.modelos.length);
+    $('baixar-box').hidden = !s.ligado;
+    var atual = localStorage.getItem('custom_api_key') === 'ollama' ? localStorage.getItem('custom_api_model') : '';
+    $('modelo').innerHTML = (s.modelos || []).map(function (m) { return '<option value="' + m.nome + '"' + (m.nome === atual ? ' selected' : '') + '>' + m.nome + (m.tamanhoGB ? ' (' + m.tamanhoGB + ' GB)' : '') + '</option>'; }).join('');
+    $('usando').textContent = emUso() ? '🦙 Em uso no jurídico: ' + localStorage.getItem('custom_api_model') + ' (no seletor de IA aparece "Chave Própria").' : 'O jurídico está usando outra IA.';
+    $('voltar').hidden = !emUso();
+    $('sugs').innerHTML = SUG.map(function (x) { return '<div class="sug"><span><b>' + x[0] + '</b> — ' + x[1] + '</span><button data-baixar="' + x[0] + '">⬇</button></div>'; }).join('');
+  }
+  function ocupado(on) { [].forEach.call(document.querySelectorAll('button'), function (b) { b.disabled = on; }); }
+  function ver() { ocupado(true); return chamar('/api/ollama/status').then(function (s) { st = s; }, function (e) { st = { ligado: false, modelos: [], msg: 'O servidor do jurídico não respondeu (' + e.message + '). Ele está ligado?' }; }).then(function () { ocupado(false); pintar(); }); }
+  $('ver').onclick = ver;
+  $('ligar').onclick = function () { ocupado(true); $('st').textContent = '⏳ Ligando… (até 10 s)'; chamar('/api/ollama/ligar', 'POST').then(function (s) { st = s; }, function (e) { st = { ligado: false, modelos: [], msg: e.message }; }).then(function () { ocupado(false); pintar(); }); };
+  $('sugs').onclick = function (e) {
+    var b = e.target.closest('[data-baixar]'); if (!b) return;
+    var nome = b.getAttribute('data-baixar');
+    ocupado(true); $('msg').textContent = '⬇ Baixando ' + nome + '… pode demorar alguns minutos.';
+    chamar('/api/ollama/baixar', 'POST', { modelo: nome }).then(function (s) { st = s; localStorage.setItem('custom_api_model', nome); }, function (er) { st = Object.assign({}, st, { msg: '❌ ' + er.message }); }).then(function () { ocupado(false); pintar(); });
+  };
+  $('usar').onclick = function () {
+    var m = $('modelo').value; if (!m) return;
+    var url = ((st && st.base) || 'http://127.0.0.1:11434') + '/v1';
+    // "Chave Própria" do jurídico (petições, chat) e o Assistente de código
+    localStorage.setItem('custom_api_key', 'ollama'); localStorage.setItem('custom_api_url', url); localStorage.setItem('custom_api_model', m);
+    localStorage.setItem('legal_model_choice', 'custom');
+    localStorage.setItem('code_api_key', 'ollama'); localStorage.setItem('code_api_url', url); localStorage.setItem('code_api_model', m);
+    pintar(); $('msg').textContent = '✅ Pronto! Volte ao jurídico: ele vai usar o Ollama (' + m + ').';
+  };
+  $('voltar').onclick = function () {
+    localStorage.setItem('legal_model_choice', 'economico');
+    if (localStorage.getItem('code_api_key') === 'ollama') ['code_api_key', 'code_api_url', 'code_api_model'].forEach(function (k) { localStorage.removeItem(k); });
+    pintar(); $('msg').textContent = 'Voltei para o Gemini.';
+  };
+  pintar(); ver();
+})();
+</script>
+</body>
+</html>

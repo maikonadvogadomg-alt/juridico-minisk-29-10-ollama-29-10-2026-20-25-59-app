@@ -1,0 +1,45 @@
+{
+  "titulo": "Juridico-MiniSK-29-10-Ollama 29-10-2026, 20-25-59",
+  "arquivo": "index.html",
+  "itens": [
+    {
+      "path": "client/index.html",
+      "nome": "Assistente Jurídico",
+      "desc": "",
+      "on": true,
+      "icone": "client/icons/icon.svg"
+    },
+    {
+      "path": "client/public/auditoria.html",
+      "nome": "Mini SK",
+      "desc": "",
+      "on": true,
+      "icone": "client/public/icon-192.png"
+    },
+    {
+      "path": "client/public/comparador.html",
+      "nome": "Comparador Jurídico — TJMG + BCB",
+      "desc": "",
+      "on": true,
+      "icone": "client/public/icon-192.png"
+    },
+    {
+      "path": "client/public/ollama.html",
+      "nome": "🦙 Ollama — SK Jurídico",
+      "desc": "",
+      "on": true,
+      "icone": "client/public/icon-192.png"
+    },
+    {
+      "path": "public/auditoria.html",
+      "nome": "Auditoria Financeira - Assistente Jurídico",
+      "desc": "",
+      "on": true,
+      "icone": ""
+    }
+  ],
+  "sub": "",
+  "logo": "",
+  "tema": "escuro",
+  "links": []
+}
